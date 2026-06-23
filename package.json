@@ -1,0 +1,29 @@
+{
+  "name": "zt",
+  "version": "0.1.0",
+  "description": "git worktree × zed CLI switcher",
+  "type": "module",
+  "bin": {
+    "zt": "./dist/index.js"
+  },
+  "scripts": {
+    "build": "tsup",
+    "dev": "tsup --watch",
+    "typecheck": "tsc --noEmit"
+  },
+  "engines": {
+    "node": ">=20"
+  },
+  "dependencies": {
+    "@clack/prompts": "^1.6.0",
+    "cac": "^7.0.0",
+    "cli-table3": "^0.6.5",
+    "execa": "^9.6.1",
+    "picocolors": "^1.1.1"
+  },
+  "devDependencies": {
+    "@types/node": "^22.20.0",
+    "tsup": "^8.5.1",
+    "typescript": "^5.9.3"
+  }
+}
