@@ -1,37 +1,21 @@
-import { listWorktrees, removeWorktree, getDirtyCount } from '../core/git.js';
-import { selectWorktree, confirmDanger } from '../core/selector.js';
-import { toSelectItem } from '../utils/format.js';
+import { removeWorktree, getDirtyCount } from '../core/git.js';
+import { confirmDanger } from '../core/selector.js';
+import { resolveWorktreeByBranch, selectWorktreeForContext } from '../core/picker.js';
 
 export const runRemove = async (
   name: string | undefined,
   force: boolean,
 ): Promise<void> => {
-  const trees = await listWorktrees();
-  if (trees.length === 0) {
-    console.log('（没有 worktree）');
-    return;
-  }
-
-  let targetTree = name ? trees.find((t) => t.branch === name) : undefined;
-
-  if (!targetTree) {
-    const items = await Promise.all(
-      trees.map(async (t) => {
-        if (t.missing || t.bare) return toSelectItem(t, { dirty: 0, behind: 0, missing: t.missing });
-        const dirty = await getDirtyCount(t.path);
-        return toSelectItem(t, { dirty, behind: 0 });
-      }),
-    );
-    const picked = await selectWorktree(items);
-    if (!picked) {
-      console.log('已取消');
-      process.exit(1);
-    }
-    targetTree = trees.find((t) => t.path === picked);
+  let targetTree = name
+    ? await resolveWorktreeByBranch(name)
+    : await selectWorktreeForContext();
+  if (name && !targetTree) {
+    throw new Error(`未找到分支 ${name} 的 worktree`);
   }
 
   if (!targetTree) {
-    throw new Error('未找到对应 worktree');
+    console.log('已取消');
+    process.exit(1);
   }
   if (targetTree.isPrimary) {
     throw new Error('⛔ 拒绝删除主 worktree');

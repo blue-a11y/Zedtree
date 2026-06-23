@@ -17,6 +17,15 @@ export const listWorktrees = async (): Promise<Worktree[]> => {
     .filter((t) => t.isPrimary || !t.missing || t.path.startsWith(rootDir));
 };
 
+// 不过滤，仓库里所有 worktree（迁移等场景用）
+export const listAllWorktrees = async (): Promise<Worktree[]> => {
+  const { stdout } = await execa('git', ['worktree', 'list', '--porcelain']);
+  return parseWorktrees(stdout).map((t) => ({
+    ...t,
+    missing: t.bare ? false : !existsSync(t.path),
+  }));
+};
+
 export const getPrimaryPath = async (): Promise<string> => {
   const trees = await listWorktrees();
   const primary = trees.find((t) => t.isPrimary) ?? trees[0];
@@ -37,7 +46,9 @@ export const removeWorktree = async (path: string, force: boolean): Promise<void
   const args = ['worktree', 'remove'];
   if (force) args.push('--force');
   args.push(path);
-  await execa('git', args);
+  const { stdout } = await execa('git', ['-C', path, 'worktree', 'list', '--porcelain']);
+  const primaryPath = parseWorktrees(stdout).find((t) => t.isPrimary)?.path ?? path;
+  await execa('git', ['-C', primaryPath, ...args]);
 };
 
 export const pruneWorktrees = async (): Promise<number> => {
@@ -47,6 +58,10 @@ export const pruneWorktrees = async (): Promise<number> => {
   } catch {
     return 0;
   }
+};
+
+export const moveWorktree = async (oldPath: string, newPath: string): Promise<void> => {
+  await execa('git', ['worktree', 'move', oldPath, newPath]);
 };
 
 export const getDirtyCount = async (path: string): Promise<number> => {
@@ -60,7 +75,7 @@ export const getDirtyCount = async (path: string): Promise<number> => {
 export const getBehindCount = async (path: string, mainBranch: string): Promise<number> => {
   if (!mainBranch || !existsSync(path)) return 0;
   try {
-    const { stdout } = await execa('git', ['-C', path, 'rev-list', '--count', `${mainBranch}..HEAD`]);
+    const { stdout } = await execa('git', ['-C', path, 'rev-list', '--count', `HEAD..${mainBranch}`]);
     return Number(stdout.trim()) || 0;
   } catch {
     return 0;

@@ -5,9 +5,11 @@ import { runNew } from './commands/new.js';
 import { runOpen } from './commands/open.js';
 import { runRemove } from './commands/remove.js';
 import { runPrune } from './commands/prune.js';
-import { runInit } from './commands/init.js';
-import { runCd } from './commands/cd.js';
+import { runPath } from './commands/path.js';
 import { runCompletion } from './commands/completion.js';
+import { runInit } from './commands/init.js';
+import { runMigrate } from './commands/migrate.js';
+import { runSetup } from './commands/setup.js';
 
 const cli = cac('zt');
 
@@ -17,7 +19,11 @@ cli
     await runOpen(name);
   });
 
-cli.command('ls', '列出所有 worktree').alias('list').action(runList);
+cli
+  .command('ls', '列出所有 worktree')
+  .alias('list')
+  .option('--json', '输出 JSON（供 agent 使用）')
+  .action((opts: { json?: boolean }) => runList(opts));
 
 cli
   .command('new <branch>', '创建新 worktree')
@@ -43,14 +49,28 @@ cli
 
 cli.command('prune', '清理失效 worktree 引用').alias('p').action(runPrune);
 
-cli.command('init <shell>', '输出 shell 集成脚本').action((shell: string) => {
-  runInit(shell);
-});
+cli
+  .command('path [name]', '输出 worktree 路径（供 shell 函数，无参弹选择器）')
+  .action(async (name?: string) => {
+    await runPath(name);
+  });
 
 cli
-  .command('cd [name]', '输出 worktree 路径（供 shell 函数）')
-  .action(async (name?: string) => {
-    await runCd(name);
+  .command('init <shell>', '输出 shell 集成脚本（zsh / bash / fish）')
+  .action((shell: string) => {
+    runInit(shell);
+  });
+
+cli
+  .command('migrate [branch]', '把已有 worktree 迁移到 zt 管理目录')
+  .action(async (branch?: string) => {
+    await runMigrate(branch);
+  });
+
+cli
+  .command('setup [shell]', '把 shell 集成写入 rc 文件（需要确认）')
+  .action(async (shell?: string) => {
+    await runSetup(shell);
   });
 
 cli.command('completion <shell>', '输出 shell tab 补全脚本（zsh / bash / fish）').action((shell: string) => {

@@ -4,7 +4,7 @@ export const runComplete = async (mode: string): Promise<void> => {
   if (mode === 'commands') {
     const cmds = [
       'ls', 'list', 'new', 'n', 'open', 'o', 'rm',
-      'prune', 'p', 'init', 'cd', 'completion',
+      'prune', 'p', 'init', 'path', 'migrate', 'setup', 'completion',
       '--help', '-h', '--version', '-v',
     ];
     process.stdout.write(cmds.join('\n'));
@@ -44,12 +44,12 @@ _zt() {
       _describe 'command' opts
       ;;
     args)
-      case \$words[1] in
-        new|open|rm|cd)
+      case \$words[2] in
+        new|open|rm|path|migrate)
           opts=(\${(f)"\$(zt --complete branches 2>/dev/null)"})
           _describe 'branch' opts
           ;;
-        init|completion)
+        init|setup|completion)
           _describe 'shell' '(zsh bash fish)'
           ;;
       esac
@@ -67,11 +67,11 @@ const BASH_COMPLETION = `_zt() {
     COMPREPLY=( \$(compgen -W "\$cmds" -- "\$cur") )
   else
     case "\${COMP_WORDS[1]}" in
-      new|open|rm|cd)
+      new|open|rm|path|migrate)
         local branches=\$(zt --complete branches 2>/dev/null)
         COMPREPLY=( \$(compgen -W "\$branches" -- "\$cur") )
         ;;
-      init|completion)
+      init|setup|completion)
         COMPREPLY=( \$(compgen -W "zsh bash fish" -- "\$cur") )
         ;;
     esac
@@ -85,9 +85,9 @@ const FISH_COMPLETION = `function __zt_complete
     zt --complete commands 2>/dev/null
   else
     switch \$cmd[2]
-      case new open rm cd
+      case new open rm path migrate
         zt --complete branches 2>/dev/null
-      case init completion
+      case init setup completion
         echo zsh bash fish
     end
   end

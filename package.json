@@ -1,10 +1,14 @@
 {
   "name": "zt",
   "version": "0.1.0",
-  "description": "git worktree × zed CLI switcher",
+  "description": "Zedtree: git worktree × zed CLI switcher",
   "type": "module",
   "bin": {
     "zt": "./dist/index.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/blue-a11y/Zedtree.git"
   },
   "scripts": {
     "build": "tsup",

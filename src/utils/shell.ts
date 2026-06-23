@@ -1,15 +1,15 @@
 const ZSH_INIT = `# zt shell integration
-z() {
+zw() {
   local target
-  target=$(zt cd "$@")
+  target=$(zt path "$@")
   if [ -n "$target" ]; then
     cd "$target"
   fi
 }`;
 
 const FISH_INIT = `# zt shell integration
-function z
-  set target (zt cd $argv)
+function zw
+  set target (zt path $argv)
   if test -n "$target"
     cd "$target"
   end
