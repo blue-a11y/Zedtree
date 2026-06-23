@@ -56,9 +56,9 @@ cli
   });
 
 cli
-  .command('init <shell>', '输出 shell 集成脚本（zsh / bash / fish）')
-  .action((shell: string) => {
-    runInit(shell);
+  .command('init [shell]', '输出 shell 集成脚本（缺省交互选择 zsh / bash / fish）')
+  .action(async (shell?: string) => {
+    await runInit(shell);
   });
 
 cli

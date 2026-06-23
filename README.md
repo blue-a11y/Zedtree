@@ -20,7 +20,7 @@ npm install -g zt
 | `zt open [name]` | `o` | 在 zed 打开（缺省交互选择） |
 | `zt rm [name]` | — | 删除（dirty 二次确认，主 worktree 拒删，`-f` 跳过） |
 | `zt prune` | `p` | 清理失效引用 |
-| `zt init <shell>` | — | 输出 shell 集成脚本（zsh / bash / fish） |
+| `zt init [shell]` | — | 输出 shell 集成脚本（缺省交互选择 zsh / bash / fish） |
 | `zt path [name]` | — | 输出 worktree 路径（无参弹选择器） |
 | `zt migrate [branch]` | — | 迁移已有 worktree 到 zt 管理目录 |
 | `zt setup [shell]` | — | 确认后把 shell 集成写入 rc 文件 |
