@@ -39,7 +39,7 @@ eval "$(zt init zsh)"
 
 ## 选择规则
 
-- 在 git 仓库内运行 `zt` / `zt open` / `zt path` / `zt rm`：直接选择当前仓库的分支 worktree。
+- 在 git 仓库内运行 `zt` / `zt open` / `zt path` / `zt rm` / `zw`：直接选择当前仓库的分支 worktree。
 - 在非 git 目录运行这些无参交互命令：先选择 `~/.zt/worktrees` 下的项目，再选择该项目的分支 worktree。
 
 ## Worktree 布局

@@ -1,5 +1,10 @@
 import * as p from '@clack/prompts';
 
+const PROMPT_IO = {
+  input: process.stdin,
+  output: process.stderr,
+};
+
 export type SelectItem = {
   name: string;
   value: string;
@@ -11,7 +16,7 @@ export const selectItem = async (
   items: SelectItem[],
 ): Promise<string | null> => {
   const options = items.map((it) => ({ value: it.value, label: `${it.name}  ${it.hint}` }));
-  const result = await p.select({ message, options });
+  const result = await p.select({ message, options, ...PROMPT_IO });
   if (p.isCancel(result)) return null;
   return result as string;
 };
@@ -22,7 +27,7 @@ export const selectWorktree = async (items: SelectItem[]): Promise<string | null
 };
 
 export const confirmDanger = async (message: string): Promise<boolean> => {
-  const result = await p.confirm({ message, initialValue: false });
+  const result = await p.confirm({ message, initialValue: false, ...PROMPT_IO });
   return !p.isCancel(result) && result === true;
 };
 
@@ -33,7 +38,7 @@ const SHELL_OPTIONS = [
 ];
 
 export const selectShell = async (): Promise<string | null> => {
-  const result = await p.select({ message: '选择 shell', options: SHELL_OPTIONS });
+  const result = await p.select({ message: '选择 shell', options: SHELL_OPTIONS, ...PROMPT_IO });
   if (p.isCancel(result)) return null;
   return result as string;
 };
