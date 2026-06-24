@@ -24,6 +24,7 @@ export const runRemove = async (
     throw new Error(`该 worktree 目录已缺失：${targetTree.path}\n用 \`zt prune\` 清理失效引用`);
   }
 
+  let shouldForce = force;
   if (!force && !targetTree.bare) {
     const dirty = await getDirtyCount(targetTree.path);
     if (dirty > 0) {
@@ -34,9 +35,10 @@ export const runRemove = async (
         console.log('已取消');
         process.exit(1);
       }
+      shouldForce = true;
     }
   }
 
-  await removeWorktree(targetTree.path, force);
+  await removeWorktree(targetTree.path, shouldForce);
   console.log(`🗑️  已删除: ${targetTree.path}`);
 };
