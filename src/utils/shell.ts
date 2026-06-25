@@ -1,7 +1,11 @@
 const ZSH_INIT = `# zt shell integration
 zw() {
   local target
-  target=$(zt path "$@")
+  if [ -n "\${NO_COLOR:-}" ]; then
+    target=$(zt path "$@")
+  else
+    target=$(FORCE_COLOR="\${FORCE_COLOR:-1}" zt path "$@")
+  fi
   if [ -n "$target" ]; then
     cd "$target"
   fi
@@ -9,7 +13,15 @@ zw() {
 
 const FISH_INIT = `# zt shell integration
 function zw
-  set target (zt path $argv)
+  if set -q NO_COLOR
+    set target (zt path $argv)
+  else
+    set -l zt_force_color 1
+    if set -q FORCE_COLOR
+      set zt_force_color $FORCE_COLOR
+    end
+    set target (env FORCE_COLOR=$zt_force_color zt path $argv)
+  end
   if test -n "$target"
     cd "$target"
   end

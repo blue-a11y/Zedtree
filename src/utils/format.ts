@@ -5,15 +5,20 @@ import type { Worktree } from '../core/worktree.js';
 import type { SelectItem } from '../core/selector.js';
 
 export type WorktreeStatus = { dirty: number; behind: number; missing?: boolean };
+type Colors = Pick<typeof pc, 'bold' | 'cyan' | 'dim' | 'green' | 'red' | 'yellow'>;
 
-export const formatStatus = (st: WorktreeStatus): string => {
-  if (st.missing) return pc.red('missing');
+const promptColors = pc.createColors(process.env.NO_COLOR ? false : true);
+
+const formatStatusWith = (colors: Colors, st: WorktreeStatus): string => {
+  if (st.missing) return colors.red('missing');
   const parts: string[] = [];
-  if (st.dirty > 0) parts.push(pc.red(`${st.dirty} dirty`));
-  if (st.behind > 0) parts.push(pc.yellow(`${st.behind} behind`));
-  if (parts.length === 0) return pc.green('clean');
-  return parts.join(pc.dim(' · '));
+  if (st.dirty > 0) parts.push(colors.red(`${st.dirty} dirty`));
+  if (st.behind > 0) parts.push(colors.yellow(`${st.behind} behind`));
+  if (parts.length === 0) return colors.green('clean');
+  return parts.join(colors.dim(' · '));
 };
+
+export const formatStatus = (st: WorktreeStatus): string => formatStatusWith(pc, st);
 
 const STAR = pc.green('★');
 const SPACE = ' ';
@@ -46,7 +51,11 @@ export const renderWorktreeTable = (
 };
 
 export const toSelectItem = (t: Worktree, st: WorktreeStatus): SelectItem => ({
-  name: t.branch,
+  name: t.isPrimary ? promptColors.bold(t.branch) : t.branch,
   value: t.path,
-  hint: formatStatus(st),
+  hint: formatStatusWith(promptColors, st),
 });
+
+export const formatProjectHint = (count: number): string => (
+  promptColors.cyan(`${count} worktree`)
+);

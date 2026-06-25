@@ -2,7 +2,7 @@ import type { Worktree } from './worktree.js';
 import { getBehindCount, getCurrentToplevel, getDirtyCount, getPrimaryBranch, listWorktrees } from './git.js';
 import { listManagedProjects } from './project.js';
 import { selectItem, selectWorktree } from './selector.js';
-import { toSelectItem } from '../utils/format.js';
+import { formatProjectHint, toSelectItem } from '../utils/format.js';
 
 const isInGitRepo = async (): Promise<boolean> => {
   try {
@@ -64,7 +64,7 @@ export const selectWorktreeForContext = async (): Promise<Worktree | null> => {
     projects.map((project) => ({
       name: project.name,
       value: project.name,
-      hint: `${project.worktrees.length} worktree`,
+      hint: formatProjectHint(project.worktrees.length),
     })),
   );
   if (!pickedProject) return null;
